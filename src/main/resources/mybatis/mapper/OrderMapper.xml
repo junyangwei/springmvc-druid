@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.springmvc.demo.mapper.OrderMapper">
+
+    <insert id="insertOrder" useGeneratedKeys="true" keyProperty="id" parameterType="com.springmvc.demo.pojo.Order">
+        INSERT INTO orders
+        (user_id, order_id, original_amount, amount)
+        VALUES
+        (#{userId}, #{orderId}, #{originalAmount}, #{amount});
+    </insert>
+
+    <select id="selectOrder" resultType="com.springmvc.demo.pojo.Order">
+        SELECT *
+        FROM orders
+        WHERE order_id = #{orderId};
+    </select>
+
+    <select id="selectOrders" resultType="com.springmvc.demo.pojo.Order">
+        SELECT *
+        FROM orders
+        WHERE user_id = #{userId}
+        LIMIT #{size};
+    </select>
+
+</mapper>
