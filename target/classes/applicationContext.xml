@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+    <!-- 启动 SpringMVC 注解功能，它会自动注册 HandlerMapping、HandlerAdapter、ExceptionResolver 等 -->
+    <mvc:annotation-driven />
+    <mvc:default-servlet-handler />
+
+    <!-- 使用 context 命名空间，通知 Spring 扫描 demo 包下所有的 Bean 类，进行注解解析 -->
+    <context:component-scan base-package="com.springmvc.demo"/>
+
+    <!-- 引入 JDBC 资源文件 -->
+    <context:property-placeholder location="classpath:jdbc.properties"/>
+
+    <!-- Druid 配置 -->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+        <property name="url" value="jdbc:mysql://127.0.0.1:3306/sell" />
+        <property name="username" value="root" />
+        <property name="password" value="123456" />
+
+        <property name="filters" value="stat" />
+
+        <property name="maxActive" value="20" />
+        <property name="initialSize" value="1" />
+        <property name="maxWait" value="6000" />
+        <property name="minIdle" value="1" />
+
+        <property name="timeBetweenEvictionRunsMillis" value="60000" />
+        <property name="minEvictableIdleTimeMillis" value="300000" />
+
+        <property name="testWhileIdle" value="true" />
+        <property name="testOnBorrow" value="false" />
+        <property name="testOnReturn" value="false" />
+
+        <property name="poolPreparedStatements" value="true" />
+        <property name="maxOpenPreparedStatements" value="20" />
+
+        <property name="asyncInit" value="true" />
+    </bean>
+
+    <!-- MyBatis 文件配置，扫描所有 mapper 文件 -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="configLocation" value="classpath:mybatis/mybatis-config.xml"/>
+        <property name="typeAliasesPackage" value="com.springmvc.demo.pojo"/>
+        <property name="mapperLocations" value="classpath:mybatis/mapper/OrderMapper.xml"/>
+    </bean>
+
+    <!-- Spring 与 MyBatis 整合配置，扫描所有 mapper，指定的映射器类是接口，接口方法可以用注解来指定 SQL 语句,但是 MyBatis 的映射器 XML 文件也可以用 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer"
+          p:basePackage="com.springmvc.demo.mapper"
+          p:sqlSessionFactoryBeanName="sqlSessionFactory"/>
+
+</beans>
